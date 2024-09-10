@@ -3,19 +3,23 @@
 #define MOTOR_1_PUL_POS_PIN 3
 #define MOTOR_2_DIR_PIN 4
 #define MOTOR_2_PUL_POS_PIN 5
+#define MOTOR_3_DIR_PIN 9
+#define MOTOR_3_PUL_POS_PIN 11
 #define RAMP_PERIOD_START_MOTOR_1 800
 #define RAMP_PERIOD_END_MOTOR_1 50
 #define RAMP_PERIOD_START_MOTOR_2 900
 #define RAMP_PERIOD_END_MOTOR_2 5
 #define PERIOD_MOTOR_2 5
-#define PERIOD_MOTOR_1 800
+#define PERIOD_MOTOR_1 100
+#define PERIOD_MOTOR_3 100
 #define ONE_REV 25000
 #define QUARTER_REV 25000/4
 #define RUN_PULSES PULSE_PER_REV
 #define CONFIG_LED_PIN 13
 #define PWR_SW_1 7
-#define LIMIT_SW_1 8
-#define LIMIT_SW_2 10
+#define PWR_SW_PWR 6
+#define LIMIT_SW_2 8
+#define LIMIT_SW_1 10
 
 bool ramp_up = true;
 
@@ -23,17 +27,23 @@ void setup() {
   Serial.begin(9600);
   pinMode(MOTOR_1_DIR_PIN, OUTPUT);
   pinMode(MOTOR_2_DIR_PIN, OUTPUT);
+  pinMode(MOTOR_3_DIR_PIN, OUTPUT);
   pinMode(MOTOR_1_PUL_POS_PIN, OUTPUT);
   pinMode(MOTOR_2_PUL_POS_PIN, OUTPUT);
+  pinMode(MOTOR_3_PUL_POS_PIN, OUTPUT);
 
   pinMode(PWR_SW_1, INPUT_PULLUP);
+  pinMode(PWR_SW_PWR, OUTPUT);
   pinMode(LIMIT_SW_1, INPUT);
   pinMode(LIMIT_SW_2, INPUT);
 
   digitalWrite(MOTOR_1_DIR_PIN, HIGH);
   digitalWrite(MOTOR_2_DIR_PIN, HIGH);
+  digitalWrite(MOTOR_3_DIR_PIN, HIGH);
   digitalWrite(MOTOR_1_PUL_POS_PIN, LOW);
   digitalWrite(MOTOR_2_PUL_POS_PIN, LOW);
+  digitalWrite(MOTOR_3_PUL_POS_PIN, LOW);
+  digitalWrite(PWR_SW_PWR, LOW);
 
 }
 
@@ -76,15 +86,15 @@ void loop() {
   // }
   if(digitalRead(LIMIT_SW_1))
   {
-    digitalWrite(MOTOR_2_DIR_PIN, HIGH);
+    digitalWrite(MOTOR_3_DIR_PIN, HIGH);
   }
   if(digitalRead(LIMIT_SW_2))
   {
-    digitalWrite(MOTOR_2_DIR_PIN, LOW);
+    digitalWrite(MOTOR_3_DIR_PIN, LOW);
   }
   if(digitalRead(PWR_SW_1))
   {
-    run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
+    run(MOTOR_3_PUL_POS_PIN, PERIOD_MOTOR_3);
   }
   
   // Serial.print("Limit_SW_1: ");
