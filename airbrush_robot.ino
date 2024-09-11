@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 
 #define MOTOR_1_DIR_PIN 2
 #define MOTOR_1_PUL_POS_PIN 3
@@ -77,6 +79,34 @@ void run(int pin, long pulse_period)
   delayMicroseconds(pulse_period);
 }
 
+void toggle_motor_direction(uint8_t pin)
+{
+    static bool dir = LOW;
+    digitalWrite(pin, dir);
+    dir = !dir;
+}
+
+void run_air_brush_motor()
+{
+    if (digitalRead(LIMIT_SW_1))
+    {
+        digitalWrite(MOTOR_2_DIR_PIN, HIGH);
+    }
+    if (digitalRead(LIMIT_SW_2))
+    {
+        digitalWrite(MOTOR_2_DIR_PIN, LOW);
+    }
+    if (digitalRead(PWR_SW_1))
+    {
+        run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
+    }
+    // run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
+    // delay(1000);
+    // toggle_motor_direction(MOTOR_2_DIR_PIN);
+
+
+}
+
 void loop() {
   //run_steps_acceleration(QUARTER_REV, RAMP_PERIOD_START_MOTOR_1, RAMP_PERIOD_END_MOTOR_1, MOTOR_1_PUL_POS_PIN);
   //run_steps_acceleration(ONE_REV, RAMP_PERIOD_START_MOTOR_2, RAMP_PERIOD_END_MOTOR_2, MOTOR_2_PUL_POS_PIN);
@@ -84,18 +114,9 @@ void loop() {
   // {   
   //   run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
   // }
-  if(digitalRead(LIMIT_SW_1))
-  {
-    digitalWrite(MOTOR_3_DIR_PIN, HIGH);
-  }
-  if(digitalRead(LIMIT_SW_2))
-  {
-    digitalWrite(MOTOR_3_DIR_PIN, LOW);
-  }
-  if(digitalRead(PWR_SW_1))
-  {
-    run(MOTOR_3_PUL_POS_PIN, PERIOD_MOTOR_3);
-  }
+
+  run_air_brush_motor();
+
   
   // Serial.print("Limit_SW_1: ");
   // Serial.println(digitalRead(LIMIT_SW_1));
