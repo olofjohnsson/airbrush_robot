@@ -11,7 +11,7 @@
 #define RAMP_PERIOD_END_MOTOR_1 50
 #define RAMP_PERIOD_START_MOTOR_2 900
 #define RAMP_PERIOD_END_MOTOR_2 5
-#define PERIOD_MOTOR_2 5
+#define PERIOD_MOTOR_2 20
 #define PERIOD_MOTOR_1 100
 #define PERIOD_MOTOR_3 100
 #define ONE_REV 25000
@@ -22,6 +22,8 @@
 #define PWR_SW_PWR 6
 #define LIMIT_SW_2 8
 #define LIMIT_SW_1 10
+
+#define RAMP_STEP 0.008
 
 bool ramp_up = true;
 
@@ -79,6 +81,67 @@ void run(int pin, long pulse_period)
   delayMicroseconds(pulse_period);
 }
 
+void run_ramp(int pin, float min_pulse_period, float max_pulse_period)
+{
+    float pulse_period = max_pulse_period;
+    static bool up = true; 
+
+    // Ramp-up phase
+    while (pulse_period > min_pulse_period) {
+        digitalWrite(pin, HIGH);
+        delayMicroseconds(pulse_period);
+        digitalWrite(pin, LOW);
+        delayMicroseconds(pulse_period);
+        
+        // Decrease the pulse period to increase speed (ramp-up)
+        pulse_period -= RAMP_STEP;  // Adjust step size if necessary for smoother ramping
+    }
+
+    pulse_period = min_pulse_period;
+
+    // Continue running at constant speed (min_pulse_period)
+    while (true) {
+        digitalWrite(pin, HIGH);
+        delayMicroseconds(min_pulse_period);
+        digitalWrite(pin, LOW);
+        delayMicroseconds(min_pulse_period);
+        if (digitalRead(LIMIT_SW_1))
+        {            
+            while (pulse_period < max_pulse_period) 
+            {
+              digitalWrite(pin, HIGH);
+              delayMicroseconds(pulse_period);
+              digitalWrite(pin, LOW);
+              delayMicroseconds(pulse_period);
+        
+            // Decrease the pulse period to increase speed (ramp-up)
+            pulse_period += RAMP_STEP;  // Adjust step size if necessary for smoother ramping
+            }
+            delay(100);
+            digitalWrite(MOTOR_2_DIR_PIN, HIGH);
+            break;
+        }
+        if (digitalRead(LIMIT_SW_2))
+        {
+            while (pulse_period < max_pulse_period) 
+            {
+              digitalWrite(pin, HIGH);
+              delayMicroseconds(pulse_period);
+              digitalWrite(pin, LOW);
+              delayMicroseconds(pulse_period);
+        
+            // Decrease the pulse period to increase speed (ramp-up)
+            pulse_period += RAMP_STEP;  // Adjust step size if necessary for smoother ramping
+            }
+            delay(100);
+            digitalWrite(MOTOR_2_DIR_PIN, LOW);
+            break;
+        }
+    }
+}
+
+
+
 void toggle_motor_direction(uint8_t pin)
 {
     static bool dir = LOW;
@@ -98,7 +161,8 @@ void run_air_brush_motor()
     }
     if (digitalRead(PWR_SW_1))
     {
-        run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
+        //run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
+        run_ramp(MOTOR_2_PUL_POS_PIN, 18, 38);
     }
     // run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
     // delay(1000);
