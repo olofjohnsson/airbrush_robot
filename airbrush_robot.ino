@@ -140,8 +140,6 @@ void run_ramp(int pin, float min_pulse_period, float max_pulse_period)
     }
 }
 
-
-
 void toggle_motor_direction(uint8_t pin)
 {
     static bool dir = LOW;
@@ -161,36 +159,11 @@ void run_air_brush_motor()
     }
     if (digitalRead(PWR_SW_1))
     {
-        //run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
         run_ramp(MOTOR_2_PUL_POS_PIN, 18, 38);
     }
-    // run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
-    // delay(1000);
-    // toggle_motor_direction(MOTOR_2_DIR_PIN);
-
-
 }
 
-void loop() {
-  //run_steps_acceleration(QUARTER_REV, RAMP_PERIOD_START_MOTOR_1, RAMP_PERIOD_END_MOTOR_1, MOTOR_1_PUL_POS_PIN);
-  //run_steps_acceleration(ONE_REV, RAMP_PERIOD_START_MOTOR_2, RAMP_PERIOD_END_MOTOR_2, MOTOR_2_PUL_POS_PIN);
-  // while (digitalRead(PWR_SW_1) && !digitalRead(LIMIT_SW_1))
-  // {   
-  //   run(MOTOR_2_PUL_POS_PIN, PERIOD_MOTOR_2);
-  // }
-
+void loop()
+{
   run_air_brush_motor();
-
-  
-  // Serial.print("Limit_SW_1: ");
-  // Serial.println(digitalRead(LIMIT_SW_1));
-  // Serial.print("Limit_SW_2: ");
-  // Serial.println(digitalRead(LIMIT_SW_2));
-  // Serial.print("Motor_1_DIR: ");
-  // Serial.println(digitalRead(MOTOR_1_DIR_PIN));
-  // Serial.print("Motor_2_DIR: ");
-  // Serial.println(digitalRead(MOTOR_2_DIR_PIN));
-  // Serial.println("Run motor"); 
-  // Serial.println("");
-  //delay(1000); 
 }
