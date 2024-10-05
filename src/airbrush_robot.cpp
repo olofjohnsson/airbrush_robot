@@ -19,10 +19,12 @@
 #define PERIOD_SIGN_MOTOR 100
 #define PERIOD_SWIPE_MOTOR 20
 #define PERIOD_SWIPE_MOTOR_INIT 200
-#define PERIOD_PAINT_MOTOR 500
+#define PERIOD_PAINT_MOTOR 100
 #define PAINT_BUTTON_STEPS 500
-#define SIGN_ROTATE_STEPS 3000
+#define PAINT_BUTTON_INITIAL_STEPS 700
+#define SIGN_ROTATE_STEPS 6250
 #define SWIPE_MOTOR_INIT_STEPS 1500
+#define PAINT_DELAY 5000
 
 // Ramping Constants
 #define RAMP_UP_STEP 0.008
@@ -126,6 +128,7 @@ void run_robot() {
           set_motor_direction(SWIPE_MOTOR_DIR_PIN, LEFT);
           stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
           rotate_sign_motor(SIGN_ROTATE_STEPS, PERIOD_SIGN_MOTOR, true);
+          delay(PAINT_DELAY);
           if (digitalRead(PWR_SW_1))
           {
             start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
@@ -136,6 +139,7 @@ void run_robot() {
           set_motor_direction(SWIPE_MOTOR_DIR_PIN, RIGHT);
           stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
           rotate_sign_motor(SIGN_ROTATE_STEPS, PERIOD_SIGN_MOTOR, true);
+          delay(PAINT_DELAY);
           if (digitalRead(PWR_SW_1))
           {
             start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
@@ -158,7 +162,7 @@ void go_to_start_position() {
     Serial.println("pulse motoer");
     pulse_motor(SWIPE_MOTOR_PUL_POS_PIN, PERIOD_SWIPE_MOTOR_INIT, SWIPE_MOTOR_INIT_STEPS);
     while(!digitalRead(PWR_SW_1));
-    start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+    start_paint_motor(PAINT_BUTTON_INITIAL_STEPS, PERIOD_PAINT_MOTOR);
 }
 
 void setup() {
