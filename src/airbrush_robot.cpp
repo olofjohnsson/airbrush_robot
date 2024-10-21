@@ -3,6 +3,9 @@
 
 #define CONFIG_LED_PIN 13
 
+// Used when painting letters
+#define CONFIG_MOTIVE_PAINT false
+
 // Pin Definitions
 #define SIGN_MOTOR_DIR_PIN 2
 #define SIGN_MOTOR_PUL_POS_PIN 3
@@ -23,6 +26,7 @@
 #define PAINT_BUTTON_STEPS 500
 #define PAINT_BUTTON_INITIAL_STEPS 700
 #define SIGN_ROTATE_STEPS 6250
+#define SIGN_MOTIVE_ROTATE_STEPS 0
 #define SWIPE_MOTOR_INIT_STEPS 1500
 #define PAINT_DELAY 5000
 
@@ -120,7 +124,7 @@ void run_ramp(int pin, float min_pulse_period, float max_pulse_period) {
 }
 
 // Main Robot Functionality
-void run_robot() {
+void run_robot_sign() {
     if (digitalRead(PWR_SW_1)) {
         run_ramp(SWIPE_MOTOR_PUL_POS_PIN, 18, 38);
         if (digitalRead(LIMIT_SW_1)) 
@@ -149,6 +153,38 @@ void run_robot() {
     }
 }
 
+// Main Robot Functionality
+void run_robot_motive() {
+    if (digitalRead(PWR_SW_1)) {
+        run_ramp(SWIPE_MOTOR_PUL_POS_PIN, 18, 38);
+        if (digitalRead(LIMIT_SW_1)) 
+        {
+          set_motor_direction(SWIPE_MOTOR_DIR_PIN, LEFT);
+          set_motor_direction(SIGN_MOTOR_DIR_PIN, LEFT);
+          stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          rotate_sign_motor(SIGN_MOTIVE_ROTATE_STEPS, PERIOD_SIGN_MOTOR, true);
+          delay(PAINT_DELAY);
+          if (digitalRead(PWR_SW_1))
+          {
+            start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          }
+        }
+
+        if (digitalRead(LIMIT_SW_2)) {
+          set_motor_direction(SWIPE_MOTOR_DIR_PIN, RIGHT);
+          set_motor_direction(SIGN_MOTOR_DIR_PIN, RIGHT);
+          stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          rotate_sign_motor(SIGN_MOTIVE_ROTATE_STEPS, PERIOD_SIGN_MOTOR, true);
+          delay(PAINT_DELAY);
+          if (digitalRead(PWR_SW_1))
+          {
+            start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          }
+        }
+        
+    }
+}
+
 // Move to Start Position
 void go_to_start_position() {
     if (!digitalRead(LIMIT_SW_2))
@@ -159,7 +195,7 @@ void go_to_start_position() {
       set_motor_direction(SWIPE_MOTOR_DIR_PIN, RIGHT);
     }
     
-    Serial.println("pulse motoer");
+    Serial.println("pulse motor");
     pulse_motor(SWIPE_MOTOR_PUL_POS_PIN, PERIOD_SWIPE_MOTOR_INIT, SWIPE_MOTOR_INIT_STEPS);
     while(!digitalRead(PWR_SW_1));
     start_paint_motor(PAINT_BUTTON_INITIAL_STEPS, PERIOD_PAINT_MOTOR);
@@ -172,5 +208,10 @@ void setup() {
 }
 
 void loop() {
-    run_robot();
+    #if(CONFIG_MOTIVE_PAINT == true)
+    run_robot_motive();
+    #else
+    run_robot_sign();
+    #endif
+    
 }
