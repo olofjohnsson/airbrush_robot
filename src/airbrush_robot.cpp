@@ -5,6 +5,7 @@
 
 // Used when painting letters
 #define CONFIG_MOTIVE_PAINT false
+#define CONFIG_NO_BACK_PAINT true
 
 // Pin Definitions
 #define SIGN_MOTOR_DIR_PIN 2
@@ -27,8 +28,12 @@
 #define PAINT_BUTTON_INITIAL_STEPS 700
 #define SIGN_ROTATE_STEPS 6250
 #define SIGN_MOTIVE_ROTATE_STEPS 0
+#define SIGN_NO_BACK_ROTATE_STEPS 3125
+#define SIGN_NO_BACK_ROTATE_STEPS_45_DEGREES 3125
+#define SIGN_NO_BACK_ROTATE_STEPS_90_DEGREES 6250
 #define SWIPE_MOTOR_INIT_STEPS 1500
 #define PAINT_DELAY 5000
+#define PAINT_DELAY_NO_BACK 45000
 
 // Ramping Constants
 #define RAMP_UP_STEP 0.008
@@ -154,6 +159,63 @@ void run_robot_sign() {
 }
 
 // Main Robot Functionality
+void run_robot_no_back_paint() {
+    static int16_t step_array[] = {2000, -4000, 2000};
+    static uint8_t array_index = 0;
+    static bool direction = true;
+
+    if (digitalRead(PWR_SW_1)) {
+        if (step_array[array_index]<0)
+        {
+          direction = false;
+        }
+        else
+        {
+          direction = true;
+        }
+        run_ramp(SWIPE_MOTOR_PUL_POS_PIN, 18, 38);
+        if (digitalRead(LIMIT_SW_1)) 
+        {
+          set_motor_direction(SWIPE_MOTOR_DIR_PIN, LEFT);
+          stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          rotate_sign_motor(abs(step_array[array_index]), PERIOD_SIGN_MOTOR, direction);
+          delay(PAINT_DELAY_NO_BACK);
+          if (digitalRead(PWR_SW_1))
+          {
+            start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          }
+          if (array_index < sizeof(step_array)/sizeof(step_array[0])-1)
+          {
+              array_index++;
+          }
+          else
+          {
+              array_index = 0;
+          }
+        }
+
+        if (digitalRead(LIMIT_SW_2)) {
+          set_motor_direction(SWIPE_MOTOR_DIR_PIN, RIGHT);
+          stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          rotate_sign_motor(abs(step_array[array_index]), PERIOD_SIGN_MOTOR, direction);
+          delay(PAINT_DELAY_NO_BACK);
+          if (digitalRead(PWR_SW_1))
+          {
+            start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          }
+          if (array_index < sizeof(step_array)/sizeof(step_array[0])-1)
+          {
+              array_index++;
+          }
+          else
+          {
+              array_index = 0;
+          }
+        }
+    }
+}
+
+// Main Robot Functionality
 void run_robot_motive() {
     if (digitalRead(PWR_SW_1)) {
         run_ramp(SWIPE_MOTOR_PUL_POS_PIN, 18, 38);
@@ -210,6 +272,8 @@ void setup() {
 void loop() {
     #if(CONFIG_MOTIVE_PAINT == true)
     run_robot_motive();
+    #elif(CONFIG_NO_BACK_PAINT == true)
+    run_robot_no_back_paint();
     #else
     run_robot_sign();
     #endif
