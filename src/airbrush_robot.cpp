@@ -29,11 +29,12 @@
 #define SIGN_ROTATE_STEPS 6250
 #define SIGN_MOTIVE_ROTATE_STEPS 0
 #define SIGN_NO_BACK_ROTATE_STEPS 3125
-#define SIGN_NO_BACK_ROTATE_STEPS_45_DEGREES 3125
-#define SIGN_NO_BACK_ROTATE_STEPS_90_DEGREES 6250
+#define SIGN_45_DEGREES 3125
+#define SIGN_90_DEGREES SIGN_45_DEGREES*2
+#define SIGN_180_DEGREES SIGN_90_DEGREES*2
 #define SWIPE_MOTOR_INIT_STEPS 1500
 #define PAINT_DELAY 5000
-#define PAINT_DELAY_NO_BACK 45000
+#define PAINT_DELAY_NO_BACK 2
 
 // Ramping Constants
 #define RAMP_UP_STEP 0.008
@@ -160,7 +161,8 @@ void run_robot_sign() {
 
 // Main Robot Functionality
 void run_robot_no_back_paint() {
-    static int16_t step_array[] = {2000, -4000, 2000};
+    /* Start with sign horisontal, front facing the sky */
+    static int16_t step_array[] = {SIGN_45_DEGREES, SIGN_45_DEGREES, SIGN_45_DEGREES, SIGN_45_DEGREES, -SIGN_180_DEGREES};
     static uint8_t array_index = 0;
     static bool direction = true;
 
@@ -179,7 +181,16 @@ void run_robot_no_back_paint() {
           set_motor_direction(SWIPE_MOTOR_DIR_PIN, LEFT);
           stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
           rotate_sign_motor(abs(step_array[array_index]), PERIOD_SIGN_MOTOR, direction);
-          delay(PAINT_DELAY_NO_BACK);
+
+          if(array_index == 4)
+          {
+            delay(PAINT_DELAY_NO_BACK*10);
+          }
+          else
+          {
+            delay(PAINT_DELAY_NO_BACK);
+          }
+
           if (digitalRead(PWR_SW_1))
           {
             start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
@@ -198,7 +209,16 @@ void run_robot_no_back_paint() {
           set_motor_direction(SWIPE_MOTOR_DIR_PIN, RIGHT);
           stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
           rotate_sign_motor(abs(step_array[array_index]), PERIOD_SIGN_MOTOR, direction);
-          delay(PAINT_DELAY_NO_BACK);
+
+          if(array_index == 4)
+          {
+            delay(PAINT_DELAY_NO_BACK*10);
+          }
+          else
+          {
+            delay(PAINT_DELAY_NO_BACK);
+          }
+          
           if (digitalRead(PWR_SW_1))
           {
             start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
