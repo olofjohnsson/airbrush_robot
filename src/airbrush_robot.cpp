@@ -34,7 +34,7 @@
 #define SIGN_180_DEGREES SIGN_90_DEGREES*2
 #define SWIPE_MOTOR_INIT_STEPS 1500
 #define PAINT_DELAY 5000
-#define PAINT_DELAY_NO_BACK 2
+#define PAINT_DELAY_NO_BACK 60000
 
 // Ramping Constants
 #define RAMP_UP_STEP 0.008
@@ -184,7 +184,7 @@ void run_robot_no_back_paint() {
 
           if(array_index == 4)
           {
-            delay(PAINT_DELAY_NO_BACK*10);
+            delay(PAINT_DELAY_NO_BACK*5);
           }
           else
           {
@@ -212,7 +212,7 @@ void run_robot_no_back_paint() {
 
           if(array_index == 4)
           {
-            delay(PAINT_DELAY_NO_BACK*10);
+            delay(PAINT_DELAY_NO_BACK*5);
           }
           else
           {
