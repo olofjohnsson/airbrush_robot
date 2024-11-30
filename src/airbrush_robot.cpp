@@ -162,7 +162,7 @@ void run_robot_sign() {
 // Main Robot Functionality
 void run_robot_no_back_paint() {
     /* Start with sign horisontal, front facing the sky */
-    static int16_t step_array[] = {SIGN_45_DEGREES, SIGN_45_DEGREES, SIGN_45_DEGREES, SIGN_45_DEGREES, -SIGN_180_DEGREES};
+    static int16_t step_array[] = {-SIGN_45_DEGREES, -SIGN_45_DEGREES, -SIGN_45_DEGREES, -SIGN_45_DEGREES, SIGN_180_DEGREES};
     static uint8_t array_index = 0;
     static bool direction = true;
 
