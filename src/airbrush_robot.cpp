@@ -4,7 +4,7 @@
 #define CONFIG_LED_PIN 13
 
 // Used when painting letters
-#define CONFIG_MOTIVE_PAINT false
+#define CONFIG_NORMAL_PAINT false
 #define CONFIG_NO_BACK_PAINT true
 
 // Pin Definitions
@@ -25,7 +25,7 @@
 #define PERIOD_SWIPE_MOTOR_INIT 200
 #define PERIOD_PAINT_MOTOR 100
 #define PAINT_BUTTON_STEPS 500
-#define PAINT_BUTTON_INITIAL_STEPS 700
+#define PAINT_BUTTON_INITIAL_STEPS 500
 #define SIGN_ROTATE_STEPS 6250
 #define SIGN_MOTIVE_ROTATE_STEPS 0
 #define SIGN_NO_BACK_ROTATE_STEPS 3125
@@ -236,34 +236,78 @@ void run_robot_no_back_paint() {
 }
 
 // Main Robot Functionality
-void run_robot_motive() {
+void run_robot() {
+    /* Start with sign horisontal, front facing the sky */
+    static int16_t step_array[] = {-SIGN_45_DEGREES, -SIGN_45_DEGREES, -SIGN_45_DEGREES, -SIGN_45_DEGREES, -SIGN_90_DEGREES, -SIGN_90_DEGREES};
+    static uint8_t array_index = 0;
+    static bool direction = true;
+
     if (digitalRead(PWR_SW_1)) {
+        if (step_array[array_index]<0)
+        {
+          direction = false;
+        }
+        else
+        {
+          direction = true;
+        }
         run_ramp(SWIPE_MOTOR_PUL_POS_PIN, 18, 38);
         if (digitalRead(LIMIT_SW_1)) 
         {
           set_motor_direction(SWIPE_MOTOR_DIR_PIN, LEFT);
-          set_motor_direction(SIGN_MOTOR_DIR_PIN, LEFT);
           stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
-          rotate_sign_motor(SIGN_MOTIVE_ROTATE_STEPS, PERIOD_SIGN_MOTOR, true);
-          delay(PAINT_DELAY);
+          rotate_sign_motor(abs(step_array[array_index]), PERIOD_SIGN_MOTOR, direction);
+
+          if(array_index == 4)
+          {
+            delay(PAINT_DELAY_NO_BACK*5);
+          }
+          else
+          {
+            delay(PAINT_DELAY_NO_BACK);
+          }
+
           if (digitalRead(PWR_SW_1))
           {
             start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
+          }
+          if (array_index < sizeof(step_array)/sizeof(step_array[0])-1)
+          {
+              array_index++;
+          }
+          else
+          {
+              array_index = 0;
           }
         }
 
         if (digitalRead(LIMIT_SW_2)) {
           set_motor_direction(SWIPE_MOTOR_DIR_PIN, RIGHT);
-          set_motor_direction(SIGN_MOTOR_DIR_PIN, RIGHT);
           stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
-          rotate_sign_motor(SIGN_MOTIVE_ROTATE_STEPS, PERIOD_SIGN_MOTOR, true);
-          delay(PAINT_DELAY);
+          rotate_sign_motor(abs(step_array[array_index]), PERIOD_SIGN_MOTOR, direction);
+
+          if(array_index == 5)
+          {
+            delay(PAINT_DELAY_NO_BACK*5);
+          }
+          else
+          {
+            delay(PAINT_DELAY_NO_BACK);
+          }
+          
           if (digitalRead(PWR_SW_1))
           {
             start_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
           }
+          if (array_index < sizeof(step_array)/sizeof(step_array[0])-1)
+          {
+              array_index++;
+          }
+          else
+          {
+              array_index = 0;
+          }
         }
-        
     }
 }
 
@@ -290,8 +334,8 @@ void setup() {
 }
 
 void loop() {
-    #if(CONFIG_MOTIVE_PAINT == true)
-    run_robot_motive();
+    #if(CONFIG_NORMAL_PAINT == true)
+    run_robot();
     #elif(CONFIG_NO_BACK_PAINT == true)
     run_robot_no_back_paint();
     #else
