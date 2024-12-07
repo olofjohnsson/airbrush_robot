@@ -286,7 +286,7 @@ void run_robot() {
           stop_paint_motor(PAINT_BUTTON_STEPS, PERIOD_PAINT_MOTOR);
           rotate_sign_motor(abs(step_array[array_index]), PERIOD_SIGN_MOTOR, direction);
 
-          if(array_index == 5)
+          if(array_index == 0)
           {
             delay(PAINT_DELAY_NO_BACK*5);
           }
